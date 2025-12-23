@@ -6,6 +6,19 @@
 
     <div class="card">
         <div class="card-body">
+            {{-- Validation errors summary --}}
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h5 class="alert-heading">Please fix the following errors:</h5>
+                    <ul class="mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
             <form method="POST" action="{{ route('projects.tasks.store', $project->id) }}">
                 @csrf
 
@@ -25,6 +38,7 @@
                     <div class="col-md-4 mb-3">
                         <label class="form-label" for="status">Status</label>
                         <select name="status" id="status" class="form-select @error('status') is-invalid @enderror">
+                            <option value="">-- Select Status --</option>
                             @foreach($statusOptions as $opt)
                                 <option value="{{ $opt }}" @selected(old('status')===$opt)>{{ ucfirst(str_replace('_',' ', $opt)) }}</option>
                             @endforeach
@@ -34,6 +48,7 @@
                     <div class="col-md-4 mb-3">
                         <label class="form-label" for="priority">Priority</label>
                         <select name="priority" id="priority" class="form-select @error('priority') is-invalid @enderror">
+                            <option value="">-- Select Priority --</option>
                             @foreach($priorityOptions as $opt)
                                 <option value="{{ $opt }}" @selected(old('priority')===$opt)>{{ ucfirst($opt) }}</option>
                             @endforeach

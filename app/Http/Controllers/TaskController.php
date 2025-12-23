@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Models\Project;
 use App\Models\Task;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
@@ -36,24 +37,9 @@ class TaskController extends Controller
     /**
      * Store a newly created task in storage.
      */
-    public function store(Request $request, Project $project)
+    public function store(StoreTaskRequest $request, Project $project)
     {
-        $validated = $request->validate([
-            'title' => ['required','string','max:255'],
-            'description' => ['nullable','string'],
-            'status' => ['required','in:'.implode(',', $this->statusOptions)],
-            'priority' => ['required','in:'.implode(',', $this->priorityOptions)],
-            'due_date' => ['nullable','date'],
-        ]);
-
-        $task = $project->tasks()->create([
-            'title' => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'status' => $validated['status'],
-            'priority' => $validated['priority'],
-            'due_date' => $validated['due_date'] ?? null,
-            'user_id' => Auth::id(),
-        ]);
+        $project->tasks()->create($request->validated() + ['user_id' => Auth::id()]);
 
         return redirect()
             ->route('projects.show', $project->id)
@@ -93,21 +79,13 @@ class TaskController extends Controller
     /**
      * Update the specified task in storage.
      */
-    public function update(Request $request, Project $project, Task $task)
+    public function update(UpdateTaskRequest $request, Project $project, Task $task)
     {
         if ($task->project_id !== $project->id) {
             abort(404);
         }
 
-        $validated = $request->validate([
-            'title' => ['required','string','max:255'],
-            'description' => ['nullable','string'],
-            'status' => ['required','in:'.implode(',', $this->statusOptions)],
-            'priority' => ['required','in:'.implode(',', $this->priorityOptions)],
-            'due_date' => ['nullable','date'],
-        ]);
-
-        $task->update($validated);
+        $task->update($request->validated());
 
         return redirect()
             ->route('projects.show', $project->id)
