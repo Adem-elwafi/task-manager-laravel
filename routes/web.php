@@ -12,5 +12,5 @@ Route::get('/', function () {
 Route::get('/health', [HealthController::class, 'index']);
 
 
-Route::resource('projects', ProjectController::class);
+Route::resource('projects', App\Http\Controllers\ProjectController::class);
 Route::resource('projects.tasks', TaskController::class);
