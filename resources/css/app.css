@@ -1,3 +1,100 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Additional Custom Styles for Task Manager */
+
+/* Smooth transitions for interactive elements only - NOT all elements */
+a:not(.btn):not(.dropdown-item):not(.nav-link),
+.card,
+.badge,
+.btn,
+.list-group-item {
+    transition: all 0.2s ease-in-out;
+}
+
+/* Link hover effects */
+a:not(.btn):not(.dropdown-item):not(.nav-link) {
+    transition: color 0.2s ease-in-out;
+}
+
+/* Card hover effects - already in app.blade.php but adding fallback */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+/* Badge animations */
+.badge {
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.badge:hover {
+    transform: scale(1.05);
+}
+
+/* Form focus styles */
+.form-control:focus,
+.form-select:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+    border-color: #86b7fe;
+}
+
+/* List group item hover */
+.list-group-item {
+    transition: background-color 0.15s ease;
+}
+
+.list-group-item:hover {
+    background-color: rgba(0,0,0,0.02);
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Loading spinner for forms */
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+}
+
+/* Mobile responsiveness improvements */
+@media (max-width: 768px) {
+    .display-1 { font-size: 3rem; }
+    .display-2 { font-size: 2.5rem; }
+    .display-3 { font-size: 2rem; }
+    .display-4 { font-size: 1.75rem; }
+    .display-5 { font-size: 1.5rem; }
+    .display-6 { font-size: 1.25rem; }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    .footer,
+    .btn,
+    .no-print {
+        display: none !important;
+    }
+    
+    .card {
+        break-inside: avoid;
+        box-shadow: none !important;
+        border: 1px solid #dee2e6 !important;
+    }
+}

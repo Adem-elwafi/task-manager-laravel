@@ -27,5 +27,9 @@ class Task extends Model
     public function activities() {
     return $this->morphMany(Activity::class, 'subject');
 }
+    public function comments() {
+        return $this->hasMany(Comment::class);
+}
+
 
 }
