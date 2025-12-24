@@ -5,9 +5,11 @@
                 <h5 class="card-title mb-1">{{ $task->title }}</h5>
                 <p class="card-text text-muted">{{ $task->description ?? 'No description.' }}</p>
             </div>
-            <div class="ms-2">
-                <a href="{{ route('projects.tasks.edit', [$task->project_id, $task->id]) }}" class="btn btn-sm btn-warning text-white">Edit</a>
-            </div>
+            @can('update', $task)
+                <div class="ms-2">
+                    <a href="{{ route('projects.tasks.edit', [$task->project_id, $task->id]) }}" class="btn btn-sm btn-warning text-white">Edit</a>
+                </div>
+            @endcan
         </div>
         
         <div class="mb-2">
@@ -18,10 +20,12 @@
             @endif
         </div>
 
-        <form action="{{ route('projects.tasks.destroy', [$task->project_id, $task->id]) }}" method="POST" style="display:inline;">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-sm btn-danger" data-confirm-delete>Delete</button>
-        </form>
+        @can('delete', $task)
+            <form action="{{ route('projects.tasks.destroy', [$task->project_id, $task->id]) }}" method="POST" style="display:inline;">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger" data-confirm-delete>Delete</button>
+            </form>
+        @endcan
     </div>
 </div>

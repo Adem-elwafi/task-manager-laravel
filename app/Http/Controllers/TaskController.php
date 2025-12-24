@@ -27,6 +27,8 @@ class TaskController extends Controller
      */
     public function create(Project $project)
     {
+        $this->authorize('create', [Task::class, $project]);
+
         return view('tasks.create', [
             'project' => $project,
             'statusOptions' => $this->statusOptions,
@@ -39,6 +41,8 @@ class TaskController extends Controller
      */
     public function store(StoreTaskRequest $request, Project $project)
     {
+        $this->authorize('create', [Task::class, $project]);
+
         $project->tasks()->create($request->validated() + ['user_id' => Auth::id()]);
 
         return redirect()
@@ -68,12 +72,9 @@ class TaskController extends Controller
             abort(404);
         }
 
-        return view('tasks.edit', [
-            'project' => $project,
-            'task' => $task,
-            'statusOptions' => $this->statusOptions,
-            'priorityOptions' => $this->priorityOptions,
-        ]);
+        $this->authorize('update', $task);
+
+        return view('tasks.edit', compact('project', 'task'));
     }
 
     /**
@@ -84,6 +85,8 @@ class TaskController extends Controller
         if ($task->project_id !== $project->id) {
             abort(404);
         }
+
+        $this->authorize('update', $task);
 
         $task->update($request->validated());
 
@@ -101,10 +104,10 @@ class TaskController extends Controller
             abort(404);
         }
 
+        $this->authorize('delete', $task);
+
         $task->delete();
 
-        return redirect()
-            ->route('projects.show', $project->id)
-            ->with('success', 'Task deleted successfully.');
+        return redirect()->route('projects.show', $project)->with('success', 'Task deleted.');
     }
 }
