@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Project;
+use App\Models\Activity;
 
 class ProjectController extends Controller
 {
@@ -27,6 +28,7 @@ public function create()
     return view('projects.create');
 }
 
+
 public function store(Request $request)
 {
     $validated = $request->validate([
@@ -47,6 +49,14 @@ public function store(Request $request)
         'name' => $validated['name'],
         'description' => $validated['description'] ?? null,
         'user_id' => $ownerId,
+    ]);
+
+    // ✅ Log activity
+    Activity::create([
+        'user_id' => $ownerId,
+        'action' => 'created_project',
+        'subject_id' => $project->id,
+        'subject_type' => Project::class,
     ]);
 
     return redirect()

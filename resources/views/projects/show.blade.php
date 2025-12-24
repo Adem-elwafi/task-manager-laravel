@@ -60,7 +60,16 @@
                 </form>
             </div>
         </div>
-        
+        <h4>Activity Log</h4>
+        <ul class="list-group mb-3">
+            @foreach($project->activities()->latest()->take(10)->get() as $activity)
+                <li class="list-group-item">
+                    {{ $activity->user->name }} {{ str_replace('_',' ', $activity->action) }}
+                    on {{ $activity->created_at->format('M d, Y H:i') }}
+                </li>
+            @endforeach
+        </ul>
+
         @forelse($project->tasks as $task)
             <x-task-card :task="$task" />
         @empty
