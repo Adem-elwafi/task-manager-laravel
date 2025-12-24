@@ -18,8 +18,28 @@ class TaskController extends Controller
      */
     public function index(Project $project)
     {
-        $tasks = $project->tasks()->latest()->get();
-        return view('tasks.index', compact('project', 'tasks'));
+        $query = $project->tasks();
+
+        // Filter by status
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        // Filter by priority
+        if (request('priority')) {
+            $query->where('priority', request('priority'));
+        }
+
+        // Search by title/description
+        if (request('search')) {
+            $query->where(function($q) {
+                $q->where('title', 'like', '%'.request('search').'%')
+                ->orWhere('description', 'like', '%'.request('search').'%');
+            });
+        }
+
+        $tasks = $query->paginate(5); // 5 per page
+        return view('tasks.index', compact('project','tasks'));
     }
 
     /**
@@ -74,7 +94,12 @@ class TaskController extends Controller
 
         $this->authorize('update', $task);
 
-        return view('tasks.edit', compact('project', 'task'));
+        return view('tasks.edit', [
+            'project' => $project,
+            'task' => $task,
+            'statusOptions' => $this->statusOptions,
+            'priorityOptions' => $this->priorityOptions,
+        ]);
     }
 
     /**

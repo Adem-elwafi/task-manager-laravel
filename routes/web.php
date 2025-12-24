@@ -1,21 +1,26 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\HealthController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/health', [HealthController::class, 'index']);
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-// Temporary: make routes accessible without auth so you can test
-Route::resource('projects', ProjectController::class);
-Route::resource('projects.tasks', TaskController::class);
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-// Placeholder login route to avoid errors when middleware expects it
-Route::get('/login', function () {
-    return redirect('/');
-})->name('login');
+    // Project and nested Task routes (protected)
+    Route::resource('projects', ProjectController::class);
+    Route::resource('projects.tasks', TaskController::class);
+});
+
+require __DIR__.'/auth.php';

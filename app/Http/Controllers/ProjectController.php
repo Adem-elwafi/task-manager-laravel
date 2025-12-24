@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\Project;
 
 class ProjectController extends Controller
 {
@@ -13,12 +14,16 @@ class ProjectController extends Controller
      */
 public function index()
 {
-    $projects = \App\Models\Project::all();
+    $this->authorize('viewAny', Project::class);
+
+    $projects = Project::query()->latest()->get();
     return view('projects.index', compact('projects'));
 }
 
 public function create()
 {
+    $this->authorize('create', Project::class);
+
     return view('projects.create');
 }
 
@@ -29,26 +34,24 @@ public function store(Request $request)
         'description' => 'nullable|string',
     ]);
 
+    $this->authorize('create', Project::class);
+
     $ownerId = Auth::id();
     if (!$ownerId) {
-        $ownerId = User::query()->value('id');
-        if (!$ownerId) {
-            $owner = User::create([
-                'name' => 'Demo User',
-                'email' => 'demo@example.com',
-                'password' => bcrypt('password'),
-            ]);
-            $ownerId = $owner->id;
-        }
+        return redirect()
+            ->route('projects.index')
+            ->with('error', 'You must be logged in to create a project.');
     }
 
-    $project = \App\Models\Project::create([
+    $project = Project::create([
         'name' => $validated['name'],
         'description' => $validated['description'] ?? null,
         'user_id' => $ownerId,
     ]);
 
-    return redirect()->route('projects.index');
+    return redirect()
+        ->route('projects.show', $project->id)
+        ->with('success', 'Project created successfully.');
 }
 
 
@@ -58,7 +61,8 @@ public function store(Request $request)
      */
     public function show(string $id)
     {
-        $project = \App\Models\Project::with('tasks')->findOrFail($id);
+        $project = Project::with('tasks')->findOrFail($id);
+        $this->authorize('view', $project);
         return view('projects.show', compact('project'));
     }
 
